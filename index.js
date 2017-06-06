@@ -1,10 +1,6 @@
-/* jshint node:true */
-
 'use strict';
 
-function isCondition(obj) {
-	return !!obj.condition;
-}
+const isCondition = obj => !!obj.condition;
 
 /**
 	Executes a workflow using the given instance and workflow rules
@@ -12,14 +8,14 @@ function isCondition(obj) {
 	@param {Mixed} instance instance to run through the rule engine
 	@param {Array} flow Flow through which to run the instance
  */
-var run = exports.run = function *(instance, flow) {
-	var res = yield flow.condition.call(instance, instance, flow);
-	
-	var branch = flow.branch[res];
+const run = exports.run = async function (instance, flow) {
+	const res = await flow.condition.call(instance, instance, flow);
+
+	const branch = flow.branch[res];
 
 	if (isCondition(branch)) {
-		return yield run(instance, branch);
+		return await run(instance, branch);
 	} else {
-		return ('function' !== typeof branch ? branch : yield branch.call(instance, instance, flow));
+		return ('function' !== typeof branch ? branch : await branch.call(instance, instance, flow));
 	}
-};
+}
